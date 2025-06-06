@@ -5,14 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>id-card-generator</title>
+    <link rel="stylesheet" href="./lib/element-plus@2.9.11/index.css" />
     <style>
         body {
             margin: 0;
             padding: 0;
-        }
-
-        #app {
-         
         }
 
     </style>
@@ -20,25 +17,27 @@
 
 <body>
     <div id="app">
-       
+        <el-button>{{ message }}</el-button>
     </div>
     <script src="./lib/vue@3.2.47.global.min.js"></script>
+    <script src="./lib/element-plus@2.9.11/index.js"></script>
     <script>
         const app = Vue.createApp({
             data() {
                 return {
-                   
+                    message: "Hello Element Plus",
                 }
             },
             mounted() {
-                
+
             },
             methods: {
                 start(n) {
-                   
+
                 }
             }
         });
+        app.use(ElementPlus);
         app.mount("#app");
     </script>
 </body>
