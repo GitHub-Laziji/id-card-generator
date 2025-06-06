@@ -34,7 +34,9 @@
             </el-select>
             <el-input v-model="form.shape" filterable placeholder="后四位形状" style="width: 240px;margin-bottom: 10px;">
             </el-input>
-            <el-input v-model="form.vCode" filterable placeholder="最后一位" style="width: 240px;margin-bottom: 10px;">
+            <el-input v-model="form.last1" filterable placeholder="最后一位" style="width: 240px;margin-bottom: 10px;">
+            </el-input>
+            <el-input v-model="form.last4Sum" filterable placeholder="最后四位和" style="width: 240px;margin-bottom: 10px;">
             </el-input>
             <el-button style="width: 240px;margin-bottom: 10px;" @click="gen()">生成</el-button>
         </div>
@@ -12869,7 +12871,8 @@
                         day: null,
                         sex: null,
                         shape: null,
-                        vCode: null,
+                        last1: null,
+                        last4Sum: null,
                     },
                     result: [],
                 }
@@ -12892,16 +12895,36 @@
                         let idCardPre = this.form.code + this.addZero(this.form.year, 4) + this.addZero(this.form.month, 2) + this.addZero(this.form.day, 2) + this.addZero(i, 3);
                         let idCard = idCardPre + this.genVerifyCode(idCardPre);
                         if (this.form.shape) {
+                            let shapeArr = [];
+                            let tArr = [];
                             let t = idCard.substring(14, 18);
-                            let v = true;
-                            for (let i = 1; i <= 3; i++) {
-                                let tn = t[i] == "X" ? 10 : Number(t[i]);
-                                let tp = Number(t[i - 1]);
-                                let td = tn - tp;
+                            for (let i = 0; i < 4; i++) {
                                 let sn = Number(this.form.shape[i]);
-                                let sp = Number(this.form.shape[i - 1]);
-                                let sd = sn - sp;
-                                if (!(td == 0 && sd == 0 || td * sd > 0)) {
+                                let tn = t[i] == "X" ? 10 : Number(t[i]);
+                                shapeArr.push({ v: sn, i });
+                                tArr.push({ v: tn, i });
+                            }
+                            shapeArr.sort((a, b) => {
+                                if (a.v != b.v) {
+                                    return a.v - b.v;
+                                } else {
+                                    return a.i - b.i;
+                                }
+                            });
+                            tArr.sort((a, b) => {
+                                if (a.v != b.v) {
+                                    return a.v - b.v;
+                                } else {
+                                    return a.i - b.i;
+                                }
+                            });
+                            let v = true;
+                            for (let i = 0; i < 4; i++) {
+                                if (shapeArr[i].i != tArr[i].i || i > 0 && !(
+                                    shapeArr[i].v == shapeArr[i - 1].v && tArr[i].v == tArr[i - 1].v
+                                    || shapeArr[i].v > shapeArr[i - 1].v && tArr[i].v > tArr[i - 1].v
+                                    || shapeArr[i].v < shapeArr[i - 1].v && tArr[i].v < tArr[i - 1].v
+                                )) {
                                     v = false;
                                     break;
                                 }
@@ -12910,8 +12933,19 @@
                                 continue;
                             }
                         }
-                        if (this.form.vCode) {
-                            if (this.form.vCode != idCard[17]) {
+                        if (this.form.last1) {
+                            if (this.form.last1 != idCard[17]) {
+                                continue;
+                            }
+                        }
+                        if (this.form.last4Sum) {
+                            let t = idCard.substring(14, 18);
+                            let s = 0;
+                            for (let i = 0; i <= 3; i++) {
+                                let tn = t[i] == "X" ? 10 : Number(t[i]);
+                                s += tn;
+                            }
+                            if (Number(this.form.last4Sum) != s) {
                                 continue;
                             }
                         }
